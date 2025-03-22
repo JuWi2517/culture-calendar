@@ -1,0 +1,178 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.App{
+  animation: fadeIn 1s ease-out forwards;
+  opacity: 0;
+}
+
+
+
+
+h1{
+    font-size: 32px;
+  font-family: "Calistoga", serif;
+  font-weight: 400;
+  color: #031C68;
+}
+/* Základ */
+body, html {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+/* Celá sekce */
+.calendar-section {
+  font-family: 'Calistoga', serif;
+  color: #001f5b;
+  background: white;
+  overflow: hidden;
+}
+
+/* Obrázek s ořezem */
+.calendar-image {
+  height: 700px;
+  background-image: url('20220921_184742.jpg');
+  background-size: cover;
+  background-position: center;
+
+  clip-path: polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%);
+  margin-bottom: -5px;
+}
+
+/* Obsah pod obrázkem */
+.calendar-content {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+/* Nadpis */
+.calendar-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+/* Události */
+.calendar-events {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+
+.event-card {
+  background-color: #f9f9f9;
+  border-left: 10px solid #5484ed; /* dynamic from React */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Badge with category */
+.event-category {
+  display: inline-block;
+  background-color: #001f5b;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+/* Title */
+.event-card h3 {
+  margin: 8px 0;
+  font-size: 1.5rem;
+  color: #001f5b;
+}
+
+/* Paragraphs */
+.event-card p {
+  margin: 4px 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Links */
+.event-card a {
+  color: #001f5b;
+  text-decoration: underline;
+}
+
+.event-card a:hover {
+  text-decoration: none;
+}
+
+.category-filter {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0 20px;
+}
+
+.category-filter select {
+  padding: 10px 16px;
+  font-size: 1rem;
+  border: 2px solid #001f5b;
+  border-radius: 30px;
+  background-color: #ffffff;
+  color: #001f5b;
+  cursor: pointer;
+  appearance: none;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+  font-family: 'Calistoga', serif;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.category-filter select:hover {
+  background-color: #f0f4ff;
+}
+
+.category-filter select:focus {
+  border-color: #003d99;
+}
+
+
+
+.dottedLine{
+  border-top: 8px dotted #031C68;
+  width: auto;
+  max-width: 900px;
+  margin: 40px auto;
+
+}
+
+
+
+
+.rotate{
+  transform: rotate(180deg);
+  overflow: hidden;
+}
+
+.footer {
+  height: 400px;
+  background-color:#031C68 ;
+  background-size: cover;
+  background-position: center;
+  clip-path: polygon(0 0, 100% 0, 100% 60%, 50% 100%, 0 60%);
+
+}
