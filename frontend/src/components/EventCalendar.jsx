@@ -86,7 +86,7 @@ const EventCalendar = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await fetch('http://192.168.100.102:3001/api/events'); // nahraď svou IP
+                const response = await fetch('https://culture-calendar.onrender.com/api/events'); // nahraď svou IP
                 if (!response.ok) throw new Error(await response.text());
                 const data = await response.json();
                 setEvents(data);
