@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import "../App.css"
 
-const API_KEY = 'AIzaSyAMX66a24D59QVR8Exs_8fQbqdw2CztSQ4';
+const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 const TIME_MIN = new Date().toISOString();
 
 // Mapování barvy ID na hex barvy
@@ -233,7 +233,7 @@ const EventCalendar = () => {
                                 <li
                                     key={event.id}
                                     className="event-card"
-                                    style={{ borderLeft: `10px solid ${colorMap[eventColorId]}` }}
+                                    //style={{ borderLeft: `10px solid ${colorMap[eventColorId]}` }}
                                 >
                                     <span className="event-category">{category}</span>
                                     <h3 style={{

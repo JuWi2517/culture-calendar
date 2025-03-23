@@ -1,5 +1,6 @@
 {
   "name": "calendar",
+  "homepage": "https://juwi2517.github.io/calendar",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,13 +8,16 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint ..",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "gh-pages": "^6.3.0",
     "googleapis": "^148.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
