@@ -54,6 +54,9 @@ const getGeocodingData = async (address) => {
     }
 };
 
+
+
+
 // Funkce pro extrakci URL z HTML popisu události
 const extractUrlFromDescription = (description) => {
     if (!description) return null;
@@ -74,6 +77,18 @@ const extractUrlFromDescription = (description) => {
     return null;
 };
 
+const cleanFacebookUrl = (url) => {
+    const match = url.match(/facebook\.com\/events\/(?:s\/[^/]+\/)?(\d+)/);
+    if (match && match[1]) {
+        return `https://www.facebook.com/events/${match[1]}`;
+    }
+    return url;
+};
+
+
+
+
+
 const EventCalendar = () => {
     const [events, setEvents] = useState([]);
     const [error, setError] = useState(null);
@@ -81,6 +96,7 @@ const EventCalendar = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedMonth, setSelectedMonth] = useState(null);
     const [availableMonths, setAvailableMonths] = useState([]);
+
 
     // Načítání událostí z API + uložení měsíců, ve kterých jsou události
     useEffect(() => {
@@ -131,6 +147,8 @@ const EventCalendar = () => {
         return `${hours}:${minutes.toString().padStart(2, '0')}`;
     };
 
+
+
     // Formátování časového rozpětí události
     const formatEventTime = (event) => {
         if (event.start?.dateTime) {
@@ -160,6 +178,8 @@ const EventCalendar = () => {
 
     // Vrací název místa z adresy
     const extractPlaceName = (location) => location.split(',')[0];
+
+
 
     // Filtrování událostí podle kategorie a měsíce
     const filteredEvents = events.filter(event => {
@@ -221,7 +241,9 @@ const EventCalendar = () => {
                             const eventColorId = event.colorId || "11";
                             const category = categoryMap[eventColorId] || "Jiné";
                             const placeName = event.location ? extractPlaceName(event.location) : '';
-                            const infoUrl = extractUrlFromDescription(event.description);
+                            const rawUrl = extractUrlFromDescription(event.description);
+                            const infoUrl = rawUrl ? cleanFacebookUrl(rawUrl) : null;
+
                             const isMobile = /Mobi|Android/i.test(navigator.userAgent);
                             const mapsLink = geoCache[event.location]
                                 ? !isMobile && geoCache[event.location].place_id
