@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
+import fetch from 'node-fetch';
 
 dotenv.config();
 
@@ -32,6 +33,28 @@ app.get('/api/events', async (req, res) => {
     } catch (err) {
         console.error('Error fetching events:', err);
         res.status(500).send('Server error');
+    }
+});
+
+// 🆕 Route to resolve short fb.me links
+app.get('/api/resolve-link', async (req, res) => {
+    const { url } = req.query;
+
+    // Validate input
+    if (!url || !url.startsWith('https://fb.me/')) {
+        return res.status(400).json({ error: 'Invalid or missing URL' });
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: 'HEAD',
+            redirect: 'follow'
+        });
+
+        res.json({ resolved: response.url });
+    } catch (err) {
+        console.error('Error resolving fb.me link:', err);
+        res.status(500).json({ error: 'Failed to resolve URL' });
     }
 });
 

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import "../App.css"
 
@@ -54,40 +53,72 @@ const getGeocodingData = async (address) => {
     }
 };
 
-
-
-
-// Funkce pro extrakci URL z HTML popisu události
-const extractUrlFromDescription = (description) => {
+// Funkce pro extrakci odkazu z popisu a případné rozlišení přes backend
+const extractUrlFromDescription = async (description) => {
     if (!description) return null;
-    const anchorRegex = /<a\s+(?:[^>]*?\s+)?href=(['"])(.*?)\1/;
+
+    const anchorRegex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/;
     const anchorMatch = description.match(anchorRegex);
-    if (anchorMatch && anchorMatch[2]) return anchorMatch[2];
-    const strippedText = description.replace(/<[^>]*>/g, '');
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const urlMatch = strippedText.match(urlRegex);
-    if (urlMatch && urlMatch.length > 0) return urlMatch[0];
-    const wwwRegex = /(www\.[^\s]+)/g;
-    const wwwMatch = strippedText.match(wwwRegex);
-    if (wwwMatch && wwwMatch.length > 0) {
-        let url = wwwMatch[0];
-        if (!url.startsWith("http")) url = "https://" + url;
-        return url;
+    let url = anchorMatch?.[2];
+
+    if (!url) {
+        const strippedText = description.replace(/<[^>]*>/g, '');
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const urlMatch = strippedText.match(urlRegex);
+        if (urlMatch?.[0]) url = urlMatch[0];
     }
-    return null;
+
+    if (!url) {
+        const wwwRegex = /(www\.[^\s]+)/g;
+        const wwwMatch = description.match(wwwRegex);
+        if (wwwMatch?.[0]) {
+            url = wwwMatch[0].startsWith('http') ? wwwMatch[0] : `https://${wwwMatch[0]}`;
+        }
+    }
+
+    // Pokud je URL fb.me link, zkusí se vyřešit přes backend
+    if (url?.includes('fb.me')) {
+        try {
+            const res = await fetch(`http://localhost:3001/api/resolve-link?url=${encodeURIComponent(url)}`);
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                const data = await res.json();
+                if (data.resolved) return data.resolved;
+            } else {
+                const text = await res.text();
+                console.warn("Neočekávaný formát odpovědi backendu:", text);
+            }
+        } catch (e) {
+            console.warn("Nepodařilo se vyřešit zkrácený FB link", e);
+        }
+    }
+
+    return url || null;
 };
 
-const cleanFacebookUrl = (url) => {
-    const match = url.match(/facebook\.com\/events\/(?:s\/[^/]+\/)?(\d+)/);
-    if (match && match[1]) {
-        return `https://www.facebook.com/events/${match[1]}`;
-    }
-    return url;
+// Komponenta pro asynchronní zobrazení odkazu
+const EventInfoLink = ({ description }) => {
+    const [resolvedUrl, setResolvedUrl] = useState(null);
+
+    useEffect(() => {
+        const resolve = async () => {
+            const result = await extractUrlFromDescription(description);
+            setResolvedUrl(result);
+        };
+        resolve();
+    }, [description]);
+
+    if (!resolvedUrl) return null;
+
+    return (
+        console.log(resolvedUrl),
+        <p>
+            <a href={resolvedUrl} target="_blank" rel="noopener noreferrer">
+                Klikněte zde pro více informací
+            </a>
+        </p>
+    );
 };
-
-
-
-
 
 const EventCalendar = () => {
     const [events, setEvents] = useState([]);
@@ -97,12 +128,10 @@ const EventCalendar = () => {
     const [selectedMonth, setSelectedMonth] = useState(null);
     const [availableMonths, setAvailableMonths] = useState([]);
 
-
-    // Načítání událostí z API + uložení měsíců, ve kterých jsou události
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await fetch('https://culture-calendar.onrender.com/api/events'); // nahraď svou IP
+                const response = await fetch('https://culture-calendar.onrender.com/api/events');
                 if (!response.ok) throw new Error(await response.text());
                 const data = await response.json();
                 setEvents(data);
@@ -122,7 +151,6 @@ const EventCalendar = () => {
         fetchEvents();
     }, []);
 
-    // Geokódování adres pro mapové odkazy
     useEffect(() => {
         const fetchGeocoding = async () => {
             const addresses = [...new Set(events.filter(e => e.location).map(e => e.location))];
@@ -140,16 +168,12 @@ const EventCalendar = () => {
         if (events.length > 0) fetchGeocoding();
     }, [events, geoCache]);
 
-    // Formátování času bez počáteční nuly u hodin
     const formatTime = (date) => {
         const hours = date.getHours();
         const minutes = date.getMinutes();
         return `${hours}:${minutes.toString().padStart(2, '0')}`;
     };
 
-
-
-    // Formátování časového rozpětí události
     const formatEventTime = (event) => {
         if (event.start?.dateTime) {
             const start = new Date(event.start.dateTime);
@@ -163,7 +187,6 @@ const EventCalendar = () => {
         return '';
     };
 
-    // Formátování data události v češtině
     const formatEventDate = (event) => {
         let start = event.start?.dateTime ? new Date(event.start.dateTime) : new Date(event.start?.date);
         let end = event.end?.dateTime ? new Date(event.end.dateTime) : new Date(event.end?.date);
@@ -176,12 +199,8 @@ const EventCalendar = () => {
         return '';
     };
 
-    // Vrací název místa z adresy
     const extractPlaceName = (location) => location.split(',')[0];
 
-
-
-    // Filtrování událostí podle kategorie a měsíce
     const filteredEvents = events.filter(event => {
         const eventColorId = event.colorId || "11";
         const category = categoryMap[eventColorId] || "Jiné";
@@ -191,7 +210,6 @@ const EventCalendar = () => {
         return (!selectedCategory || category === selectedCategory) && (!selectedMonth || month === selectedMonth);
     });
 
-    // Seskupení událostí podle měsíce
     const eventsByMonth = filteredEvents.reduce((acc, event) => {
         const date = new Date(event.start?.dateTime || event.start?.date);
         const rawMonth = date.toLocaleString('cs-CZ', { month: 'long' });
@@ -206,7 +224,6 @@ const EventCalendar = () => {
             {error && <p>Chyba při načítání událostí: {error}</p>}
             {events.length === 0 && !error && <p>Nenalezeny žádné události.</p>}
 
-            {/* Dropdown filtry */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', margin: '30px 0' }}>
                 <div className="category-filter">
                     <select
@@ -232,7 +249,6 @@ const EventCalendar = () => {
                 </div>
             </div>
 
-            {/* Výpis událostí po měsících */}
             {Object.entries(eventsByMonth).map(([month, events]) => (
                 <div key={month} style={{ marginBottom: '40px' }}>
                     <h2 style={{ paddingBottom: '10px' }}>{month}</h2>
@@ -241,8 +257,6 @@ const EventCalendar = () => {
                             const eventColorId = event.colorId || "11";
                             const category = categoryMap[eventColorId] || "Jiné";
                             const placeName = event.location ? extractPlaceName(event.location) : '';
-                            const rawUrl = extractUrlFromDescription(event.description);
-                            const infoUrl = rawUrl ? cleanFacebookUrl(rawUrl) : null;
 
                             const isMobile = /Mobi|Android/i.test(navigator.userAgent);
                             const mapsLink = geoCache[event.location]
@@ -255,13 +269,9 @@ const EventCalendar = () => {
                                 <li
                                     key={event.id}
                                     className="event-card"
-                                    //style={{ borderLeft: `10px solid ${colorMap[eventColorId]}` }}
                                 >
                                     <span className="event-category">{category}</span>
-                                    <h3 style={{
-                                        wordWrap: 'break-word',
-                                        overflowWrap: 'break-word'
-                                    }}>{event.summary}</h3>
+                                    <h3 style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>{event.summary}</h3>
                                     <p><strong>Datum:</strong> {formatEventDate(event)}</p>
                                     <p><strong>Začátek:</strong> {formatEventTime(event)}</p>
                                     {event.location && (
@@ -269,9 +279,7 @@ const EventCalendar = () => {
                                             ? <a href={mapsLink} target="_blank" rel="noopener noreferrer">{placeName}</a>
                                             : placeName}</p>
                                     )}
-                                    {infoUrl && (
-                                        <p><a href={infoUrl} target="_blank" rel="noopener noreferrer">Klikněte zde pro více informací</a></p>
-                                    )}
+                                    <EventInfoLink description={event.description} />
                                 </li>
                             );
                         })}

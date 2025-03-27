@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import emailjs from '@emailjs/browser';
 import '../ContactForm.css';
 
@@ -8,7 +8,10 @@ const ContactForm = () => {
     const [sent, setSent] = useState(false);
     const [error, setError] = useState(false);
 
-    emailjs.init("S9b38i735A8ty8_X4");
+    useEffect(() => {
+        emailjs.init("S9b38i735A8ty8_X4");
+    }, []);
+
 
     const sendEmail = (e) => {
         e.preventDefault();
@@ -16,7 +19,7 @@ const ContactForm = () => {
         setError(false);
 
         emailjs.sendForm(
-            'service_dwtt5n9',
+            'service_4pjylnw',
             'template_jikm4do',
             form.current,
             'S9b38i735A8ty8_X4'
