@@ -40,7 +40,7 @@ const ContactForm = () => {
                 <input type="text" name="name" placeholder="Jméno a příjmení / firma (povinné)" required />
                 <input type="text" name="phone" placeholder="Telefonní číslo" />
                 <input type="email" name="email" placeholder="E-mailová adresa (povinné)" required />
-                <textarea name="message" placeholder="Zpráva (nejlépe link na událost)" rows="6"></textarea>
+                <textarea name="message" placeholder="Zpráva (nejlépe link na událost)" rows="6" required></textarea>
                 <button type="submit">Odeslat</button>
                 {sent && <p className="form-success">Zpráva byla odeslána.</p>}
                 {error && <p className="form-error">Nastala chyba při odesílání zprávy.</p>}
