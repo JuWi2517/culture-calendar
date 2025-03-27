@@ -8,6 +8,8 @@ const ContactForm = () => {
     const [sent, setSent] = useState(false);
     const [error, setError] = useState(false);
 
+    emailjs.init("S9b38i735A8ty8_X4");
+
     const sendEmail = (e) => {
         e.preventDefault();
         setSent(false);
