@@ -79,7 +79,7 @@ const extractUrlFromDescription = async (description) => {
     // Pokud je URL fb.me link, zkusí se vyřešit přes backend
     if (url?.includes('fb.me')) {
         try {
-            const res = await fetch(`http://localhost:3001/api/resolve-link?url=${encodeURIComponent(url)}`);
+            const res = await fetch(`https://culture-calendar.onrender.com/api/resolve-link?url=${encodeURIComponent(url)}`);
             const contentType = res.headers.get("content-type");
             if (contentType && contentType.includes("application/json")) {
                 const data = await res.json();
